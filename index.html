@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d18">
+  <meta name="description" content="NETFRIES — filmlar va seriallarni kashf eting. Sevimli hikoyalaringizni bir joyda toping.">
+  <title>NETFRIES — Kino olami</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080d18;
+      --surface: #101a2b;
+      --surface-raised: #142239;
+      --text: #f5f7fb;
+      --muted: #a7b3c5;
+      --blue: #39a9ff;
+      --blue-strong: #1688ff;
+      --border: rgba(167, 193, 223, .16);
+      --radius: 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+    body { margin: 0; min-width: 320px; background: var(--bg); color: var(--text); }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #8bcfff; outline-offset: 3px; }
+    .skip-link { position: absolute; z-index: 20; top: -60px; left: 16px; padding: 10px 14px; background: white; color: #07101f; border-radius: 8px; }
+    .skip-link:focus { top: 12px; }
+    .topbar { position: sticky; z-index: 10; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 15px clamp(18px, 6vw, 88px); background: rgba(8, 13, 24, .92); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); }
+    .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--text); text-decoration: none; font-size: 1.25rem; font-weight: 900; letter-spacing: .04em; white-space: nowrap; }
+    .brand-mark { color: var(--blue); font-size: 1.5rem; }
+    .nav { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 32px); }
+    .nav a { color: #d3dbe7; text-decoration: none; font-size: .94rem; }
+    .nav a:hover { color: var(--blue); }
+    .hero { position: relative; overflow: hidden; min-height: 405px; display: flex; align-items: center; padding: 70px clamp(20px, 8vw, 120px); background: radial-gradient(ellipse at 82% 45%, rgba(35, 122, 194, .5), transparent 34%), linear-gradient(110deg, #0b1c31 0%, #123a61 54%, #10172a 100%); }
+    .hero::after { position: absolute; content: "✦"; right: 12%; top: 4%; color: rgba(202, 231, 255, .13); font-size: clamp(180px, 30vw, 420px); line-height: 1; transform: rotate(-12deg); pointer-events: none; }
+    .hero-content { position: relative; z-index: 1; max-width: 620px; }
+    .eyebrow { margin: 0 0 12px; color: #70c4ff; font-size: .78rem; font-weight: 800; letter-spacing: .19em; }
+    h1 { margin: 0; max-width: 650px; font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: 1.04; letter-spacing: -.045em; }
+    .hero-copy { max-width: 490px; margin: 18px 0 25px; color: #d0deec; line-height: 1.7; }
+    .primary-button, .secondary-button, .filter-button, .favorite-button, .close-button { border: 0; cursor: pointer; }
+    .primary-button { display: inline-flex; justify-content: center; align-items: center; gap: 9px; padding: 12px 19px; border-radius: 10px; background: var(--blue-strong); color: white; font-weight: 750; text-decoration: none; box-shadow: 0 8px 26px rgba(22, 136, 255, .24); transition: transform .18s ease, background .18s ease; }
+    .primary-button:hover { background: #3299ff; transform: translateY(-2px); }
+    main { width: min(1200px, 100%); margin: 0 auto; padding: 30px clamp(18px, 5vw, 50px) 55px; }
+    .search-wrap { position: relative; margin-bottom: 32px; }
+    .search-icon { position: absolute; top: 50%; left: 16px; color: #8da1b9; transform: translateY(-50%); pointer-events: none; }
+    .search { width: 100%; min-height: 50px; padding: 13px 16px 13px 45px; border: 1px solid #31445e; border-radius: 11px; background: #0e1828; color: var(--text); }
+    .search::placeholder { color: #899ab0; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 36px 0 17px; }
+    .section-heading h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 1.75rem); letter-spacing: -.025em; }
+    .results-count { color: var(--muted); font-size: .9rem; }
+    .filters { display: flex; flex-wrap: wrap; gap: 9px; margin: 0 0 20px; }
+    .filter-button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px; background: #101a2b; color: #c7d2e1; transition: background .16s ease, border-color .16s ease; }
+    .filter-button:hover, .filter-button[aria-pressed="true"] { border-color: #3a9ff0; background: #123457; color: white; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr)); gap: 18px; }
+    .movie-card { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+    .movie-card:hover { transform: translateY(-4px); border-color: rgba(76, 171, 255, .55); box-shadow: 0 14px 32px rgba(0, 0, 0, .22); }
+    .poster { position: relative; isolation: isolate; display: flex; align-items: end; min-height: 225px; padding: 16px; overflow: hidden; background: var(--poster); }
+    .poster::before { position: absolute; z-index: -1; content: ""; width: 175px; height: 175px; top: -42px; right: -40px; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; box-shadow: 0 0 0 19px rgba(255,255,255,.04), 0 0 0 40px rgba(255,255,255,.035); }
+    .poster::after { position: absolute; z-index: -1; content: ""; inset: 45% 0 0; background: linear-gradient(transparent, rgba(4, 8, 17, .86)); }
+    .poster-title { max-width: 100%; font-size: 1.18rem; font-weight: 850; line-height: 1.15; text-shadow: 0 2px 10px rgba(0,0,0,.65); }
+    .card-info { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px 12px; }
+    .card-meta { min-width: 0; color: var(--muted); font-size: .82rem; }
+    .card-meta span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .favorite-button { flex: 0 0 auto; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 50%; background: #17243a; color: #d8e2ee; font-size: 1.05rem; }
+    .favorite-button:hover, .favorite-button[aria-pressed="true"] { color: #ff8293; border-color: rgba(255,130,147,.55); }
+    .movie-open { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+    .empty-state { grid-column: 1 / -1; padding: 35px 20px; border: 1px dashed #40516a; border-radius: var(--radius); color: var(--muted); text-align: center; }
+    .ad { margin: 38px 0; padding: 22px; border: 1px dashed #47729b; border-radius: 13px; background: linear-gradient(100deg, #10243b, #101a2b); color: #b8cce0; }
+    .ad strong { display: block; margin-bottom: 5px; color: #e4f2ff; letter-spacing: .08em; }
+    .premium { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; margin-top: 42px; padding: clamp(20px, 4vw, 32px); border: 1px solid rgba(66, 157, 241, .25); border-radius: var(--radius); background: radial-gradient(ellipse at right, rgba(30, 104, 173, .28), transparent 58%), #101a2b; }
+    .premium h2 { margin: 0 0 7px; }
+    .premium p { margin: 0; color: var(--muted); }
+    .secondary-button { padding: 10px 15px; border: 1px solid #47729b; border-radius: 9px; background: #10243b; color: #e4f2ff; font-weight: 700; }
+    footer { padding: 24px 18px; border-top: 1px solid var(--border); color: #879bb2; text-align: center; font-size: .9rem; }
+    .modal { position: fixed; z-index: 30; inset: 0; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, .78); }
+    .modal[aria-hidden="false"] { display: flex; }
+    .modal-box { position: relative; width: min(480px, 100%); padding: 28px; border: 1px solid var(--border); border-radius: 16px; background: #102038; box-shadow: 0 24px 80px rgba(0,0,0,.48); }
+    .modal-box h2 { margin: 0 38px 10px 0; }
+    .modal-box p { color: #c4d2e2; line-height: 1.6; }
+    .close-button { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; background: #1b2b43; color: white; font-size: 1.2rem; }
+    .modal-note { margin: 0 0 20px; padding: 12px; border-radius: 9px; background: rgba(255,255,255,.05); color: #b7c7d9 !important; font-size: .9rem; }
+    @media (max-width: 600px) {
+      .topbar { flex-wrap: wrap; gap: 10px; padding: 12px 18px; }
+      .brand { font-size: 1.1rem; }
+      .nav { width: 100%; justify-content: space-between; gap: 10px; }
+      .nav a { font-size: .88rem; }
+      .hero { min-height: 360px; padding: 58px 22px; }
+      .hero::after { right: -18%; top: 21%; }
+      main { padding-top: 22px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .poster { min-height: 195px; padding: 12px; }
+      .poster-title { font-size: 1.05rem; }
+      .section-heading { align-items: start; flex-direction: column; gap: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Asosiy kontentga o‘tish</a>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="NETFRIES bosh sahifa"><span class="brand-mark" aria-hidden="true">🍟</span> NETFRIES</a>
+    <nav class="nav" aria-label="Asosiy navigatsiya">
+      <a href="#home">Bosh sahifa</a>
+      <a href="#films">Filmlar</a>
+      <a href="#series">Seriallar</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="hero-content">
+      <p class="eyebrow">NETFRIES ORIGINAL</p>
+      <h1 id="hero-title">Kino olamiga sho‘ng‘ing.</h1>
+      <p class="hero-copy">Sevimli filmlaringiz va seriallaringizni bir joyda kashf eting. Kayfiyatingizga mos hikoyani bugunoq toping.</p>
+      <a class="primary-button" href="#films"><span aria-hidden="true">▶</span> Katalogni ko‘rish</a>
+    </div>
+  </section>
+
+  <main id="main">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <label for="search" class="skip-link">Film yoki serial qidiring</label>
+      <input class="search" id="search" type="search" placeholder="Film yoki serial nomini qidiring..." autocomplete="off">
+    </div>
+
+    <section aria-labelledby="films">
+      <div class="section-heading">
+        <h2 id="films">🔥 Ommabop filmlar</h2>
+        <span class="results-count" id="film-count" aria-live="polite"></span>
+      </div>
+      <div class="filters" role="group" aria-label="Janr bo‘yicha filmlarni saralash">
+        <button class="filter-button" type="button" data-filter="all" aria-pressed="true">Barchasi</button>
+        <button class="filter-button" type="button" data-filter="Drama" aria-pressed="false">Drama</button>
+        <button class="filter-button" type="button" data-filter="Sarguzasht" aria-pressed="false">Sarguzasht</button>
+        <button class="filter-button" type="button" data-filter="Komediya" aria-pressed="false">Komediya</button>
+        <button class="filter-button" type="button" data-filter="Fantastika" aria-pressed="false">Fantastika</button>
+      </div>
+      <div class="grid" id="filmgrid" aria-live="polite"></div>
+    </section>
+
+    <aside class="ad" aria-label="Reklama joyi">
+      <strong>REKLAMA JOYI</strong>
+      <span>Hozircha reklama namunasi. Hamkorlik takliflari tez orada.</span>
+    </aside>
+
+    <section aria-labelledby="series">
+      <div class="section-heading">
+        <h2 id="series">🎬 Seriallar</h2>
+        <span class="results-count" id="series-count"></span>
+      </div>
+      <div class="grid" id="seriesgrid" aria-live="polite"></div>
+    </section>
+
+    <section class="premium" aria-labelledby="premium-title">
+      <div>
+        <h2 id="premium-title">⭐ NETFRIES Premium</h2>
+        <p>Premium obuna — tez orada. Yangiliklarni kuzatib boring!</p>
+      </div>
+      <button class="secondary-button" type="button" id="premium-button">Batafsil</button>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> NETFRIES. Barcha huquqlar himoyalangan.</footer>
+
+  <div class="modal" id="player" role="dialog" aria-modal="true" aria-labelledby="movietitle" aria-hidden="true">
+    <div class="modal-box">
+      <button class="close-button" type="button" aria-label="Yopish">×</button>
+      <h2 id="movietitle">NETFRIES</h2>
+      <p id="movie-description"></p>
+      <p class="modal-note">Bu demo katalog. Haqiqiy film namoyishi hozircha mavjud emas.</p>
+      <button class="primary-button close-modal" type="button">Tushunarli</button>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+    const titles = [
+      { name: 'So‘nggi manzil', type: 'film', genre: 'Triller', year: 2025, color: 'linear-gradient(145deg,#2376ad,#10172c)', description: 'Kutilmagan burilishlar va jasorat haqidagi hayajonli hikoya.' },
+      { name: 'Tun sirlari', type: 'film', genre: 'Drama', year: 2024, color: 'linear-gradient(145deg,#714b85,#15152d)', description: 'Tun sukunatida ochiladigan sirlar va tanlovlar haqida.' },
+      { name: 'Kulgi va hayot', type: 'film', genre: 'Komediya', year: 2025, color: 'linear-gradient(145deg,#bb713b,#301b35)', description: 'Do‘stlik, oilaviy quvonch va kulgili sarguzashtlar.' },
+      { name: 'Boshqa olam', type: 'film', genre: 'Fantastika', year: 2026, color: 'linear-gradient(145deg,#267e88,#101b45)', description: 'Yangi olamlar va cheksiz imkoniyatlar sari sayohat.' },
+      { name: 'Chegara', type: 'film', genre: 'Sarguzasht', year: 2024, color: 'linear-gradient(145deg,#984536,#17172a)', description: 'Mardlik va qat’iyat sinovdan o‘tadigan sarguzasht.' },
+      { name: 'Yashirin haqiqat', type: 'film', genre: 'Drama', year: 2025, color: 'linear-gradient(145deg,#4b6977,#151d32)', description: 'O‘tmish izlari va haqiqatni izlash haqidagi drama.' },
+      { name: 'Qaytish', type: 'series', genre: 'Drama', year: 2025, color: 'linear-gradient(145deg,#287d88,#101b45)', description: 'Yangi hayot boshlashga qaror qilgan insonlar haqida serial.' },
+      { name: 'Maxfiy guruh', type: 'series', genre: 'Sarguzasht', year: 2026, color: 'linear-gradient(145deg,#7252a1,#15152d)', description: 'Bir jamoa, murakkab topshiriqlar va kutilmagan sarguzashtlar.' }
+    ];
+    const filmGrid = document.getElementById('filmgrid');
+    const seriesGrid = document.getElementById('seriesgrid');
+    const searchInput = document.getElementById('search');
+    const modal = document.getElementById('player');
+    const modalTitle = document.getElementById('movietitle');
+    const modalDescription = document.getElementById('movie-description');
+    let activeFilter = 'all';
+    let lastFocusedElement = null;
+    let searchQuery = '';
+
+    function getFavorites() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem('netfries-favorites') || '[]');
+        return new Set(Array.isArray(parsed) ? parsed.filter(value => typeof value === 'string') : []);
+      } catch {
+        return new Set();
+      }
+    }
+    let favorites = getFavorites();
+
+    function saveFavorites() {
+      try { localStorage.setItem('netfries-favorites', JSON.stringify([...favorites])); } catch { /* Storage may be disabled; favorites still work for this page. */ }
+    }
+
+    function cardMarkup(item) {
+      const favorite = favorites.has(item.name);
+      const kind = item.type === 'film' ? 'Film' : 'Serial';
+      return `<article class="movie-card">
+        <button class="movie-open" type="button" data-open="${item.name}" aria-label="${item.name} haqida batafsil">
+          <span class="poster" style="--poster:${item.color}"><span class="poster-title">${item.name}</span></span>
+        </button>
+        <div class="card-info">
+          <div class="card-meta"><span>${kind} · ${item.year}</span><span>${item.genre}</span></div>
+          <button class="favorite-button" type="button" data-favorite="${item.name}" aria-label="${favorite ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo‘shish'}: ${item.name}" aria-pressed="${favorite}">${favorite ? '♥' : '♡'}</button>
+        </div>
+      </article>`;
+    }
+
+    function render() {
+      const query = searchQuery.trim().toLocaleLowerCase('uz');
+      const visibleFilms = titles.filter(item => item.type === 'film' && (activeFilter === 'all' || item.genre === activeFilter) && `${item.name} ${item.genre} ${item.year}`.toLocaleLowerCase('uz').includes(query));
+      const visibleSeries = titles.filter(item => item.type === 'series' && `${item.name} ${item.genre} ${item.year}`.toLocaleLowerCase('uz').includes(query));
+      filmGrid.innerHTML = visibleFilms.length ? visibleFilms.map(cardMarkup).join('') : '<p class="empty-state">Mos film topilmadi. Boshqa so‘z bilan qidirib ko‘ring.</p>';
+      seriesGrid.innerHTML = visibleSeries.length ? visibleSeries.map(cardMarkup).join('') : '<p class="empty-state">Mos serial topilmadi.</p>';
+      document.getElementById('film-count').textContent = `${visibleFilms.length} ta film`;
+      document.getElementById('series-count').textContent = `${visibleSeries.length} ta serial`;
+    }
+
+    function openPlayer(name) {
+      const item = titles.find(title => title.name === name);
+      if (!item) return;
+      lastFocusedElement = document.activeElement;
+      modalTitle.textContent = item.name;
+      modalDescription.textContent = item.description;
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      modal.querySelector('.close-button').focus();
+    }
+
+    function closePlayer() {
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') lastFocusedElement.focus();
+    }
+
+    document.addEventListener('click', event => {
+      const openButton = event.target.closest('[data-open]');
+      if (openButton) openPlayer(openButton.dataset.open);
+      const favoriteButton = event.target.closest('[data-favorite]');
+      if (favoriteButton) {
+        const name = favoriteButton.dataset.favorite;
+        if (favorites.has(name)) favorites.delete(name); else favorites.add(name);
+        saveFavorites();
+        render();
+      }
+      if (event.target.closest('.close-button, .close-modal')) closePlayer();
+      if (event.target === modal) closePlayer();
+      if (event.target.id === 'premium-button') {
+        modalTitle.textContent = 'NETFRIES Premium';
+        modalDescription.textContent = 'Premium obuna imkoniyatlari va ishga tushish sanasi haqida tez orada ma’lumot beramiz.';
+        lastFocusedElement = event.target;
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        modal.querySelector('.close-button').focus();
+      }
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closePlayer();
+    });
+    searchInput.addEventListener('input', event => { searchQuery = event.target.value; render(); });
+    document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll('[data-filter]').forEach(filter => filter.setAttribute('aria-pressed', String(filter === button)));
+      render();
+    }));
+    document.getElementById('year').textContent = new Date().getFullYear();
+    render();
+  </script>
+</body>
+</html>
